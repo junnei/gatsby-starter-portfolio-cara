@@ -152,8 +152,8 @@ import torch.nn.functional as F
 
 function trainCode(props){
     return train_lib(props)+
-props.imageSizeX+`,`+props.imageSizeY+
-((props.imageSizeX==="244") ?
+props.data.imageSizeX+`,`+props.data.imageSizeY+
+((props.data.imageSizeX==="244") ?
 `from torch.utils.tensorboard import SummaryWriter`
 :
 ``)

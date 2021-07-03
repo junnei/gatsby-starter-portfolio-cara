@@ -90,7 +90,7 @@ export default function Component () {
    <>
      <form>
       <text>image size(x)</text>
-      <input
+      <input required
         placeholder="x"
         value={inputs.data.imageSizeX}
         onChange={(e) => setInputs({
@@ -102,7 +102,7 @@ export default function Component () {
       })}
       />
       <text>image size(y)</text>
-      <input
+      <input required
         placeholder="y"
         value={inputs.data.imageSizeY}
         onChange={(e) => setInputs({
@@ -114,7 +114,7 @@ export default function Component () {
       })}
       />
       <br></br>
-      <select
+      <select required
         name="layer_type"
         multiple size="6"
         onChange={(e) => setInputs({
@@ -148,7 +148,7 @@ export default function Component () {
       &&
       <div>
         <text>x</text>
-        <input
+        <input required
           placeholder="x"
           onChange={(e) => setInputs({
             ...inputs,
@@ -170,7 +170,7 @@ export default function Component () {
       &&
       <div>
         <text>dim</text>
-        <input
+        <input required
           placeholder="dim"
           onChange={(e) => setInputs({
             ...inputs,
@@ -191,7 +191,7 @@ export default function Component () {
       &&
       <div>
         <text>p</text>
-        <input
+        <input required
           placeholder="p"
           onChange={(e) => setInputs({
             ...inputs,
@@ -215,7 +215,7 @@ export default function Component () {
       &&
       <div>
         <text>in</text>
-        <input
+        <input required
           placeholder="in"
           onChange={(e) => setInputs({
             ...inputs,
@@ -239,7 +239,7 @@ export default function Component () {
       &&
       <div>
         <text>out</text>
-        <input
+        <input required
           placeholder="out"
           onChange={(e) => setInputs({
             ...inputs,
@@ -260,7 +260,7 @@ export default function Component () {
       &&
       <div>
         <text>kernel</text>
-        <input
+        <input required
           placeholder="kernel size"
           onChange={(e) => setInputs({
             ...inputs,
@@ -281,7 +281,7 @@ export default function Component () {
       &&
       <div>
         <text>stride</text>
-        <input
+        <input required
           placeholder="stride size"
           onChange={(e) => setInputs({
             ...inputs,
@@ -297,14 +297,15 @@ export default function Component () {
       </div>
       }
 
-      <div>{inputs.fileName}</div>
-    </form>
-
     <button onClick={addLayer}>
         Add Layer
     </button>
 
     <button onClick={showCode}>Show Code</button>
+
+    </form>
+
+    <div>{inputs.fileName}</div>
 
     <div>
       <button onClick={downloadZip}>Zip All</button>
