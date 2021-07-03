@@ -297,12 +297,11 @@ export default function Component () {
       </div>
       }
 
-    <button onClick={addLayer}>
-        Add Layer
-    </button>
-
-    <button onClick={showCode}>Show Code</button>
-
+    <div>
+      <button onClick={addLayer}>Add Layer</button>
+      <button onClick={showCode}>Show Code</button>
+    </div>
+    
     </form>
 
     <div>{inputs.fileName}</div>
