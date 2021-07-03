@@ -27,9 +27,6 @@ export default function Component () {
       return new File([editorRef.current.getValue()], file, {type: 'text/plain'})
     };
 
-    const modelfile = await setFile("model.py");
-    const trainfile = await setFile("train.py");
-
     var zip = new JSZip();
     zip.file("model.py", await setFile("model.py"));
     zip.file("train.py", await setFile("train.py"));
@@ -37,11 +34,6 @@ export default function Component () {
         .then(function callback(blob) {
             FileSaver.saveAs(blob, "MLCoke.zip");
         });
-    const file = await new Blob([modelfile, trainfile], {type: 'application/zip'});
-    element.href = URL.createObjectURL(file);
-    element.download = "Download.zip";
-    document.body.appendChild(element); // Required for this to work in FireFox
-    element.click();
 
     setInputs({
       ...inputs,
