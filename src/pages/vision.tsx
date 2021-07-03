@@ -3,6 +3,9 @@ import React, {useRef, useState } from 'react'
 import Editor from "@monaco-editor/react";
 import files from "../components/files";
 
+import JSZip from 'jszip';
+import FileSaver from 'file-saver';
+
 export default function Component () {
 
   const editorRef = useRef(null);
@@ -11,14 +14,84 @@ export default function Component () {
     editorRef.current = editor; 
   }
   
-  function showValue() {
+
+  async function downloadZip() {
+    const element = document.createElement("a");
+    const initFile = inputs.fileName;
+
+    async function setFile(file){
+      setInputs({
+        ...inputs,
+        fileName : file
+      });
+      return new File([editorRef.current.getValue()], file, {type: 'text/plain'})
+    };
+
+    const modelfile = await setFile("model.py");
+    const trainfile = await setFile("train.py");
+
+    var zip = new JSZip();
+    zip.file("model.py", await setFile("model.py"));
+    zip.file("train.py", await setFile("train.py"));
+    zip.generateAsync({ type: "blob" })
+        .then(function callback(blob) {
+            FileSaver.saveAs(blob, "MLCoke.zip");
+        });
+    const file = await new Blob([modelfile, trainfile], {type: 'application/zip'});
+    element.href = URL.createObjectURL(file);
+    element.download = "Download.zip";
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+
+    setInputs({
+      ...inputs,
+      fileName : initFile
+    });
+
+  }
+
+  function downloadFile() {
+    const element = document.createElement("a");
+    const file = new Blob([editorRef.current.getValue()], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = inputs.fileName;
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+  }
+  
+  function showCode() {
     alert(editorRef.current.getValue());
   }
 
+  function addLayer() {
+    setInputs({
+      ...inputs,
+      layerNum: 0,
+      model: [
+        ...inputs.model,
+        {
+          layerNum: inputs.layerNum+1,
+          type: inputs.currentLayer.type,
+          props: inputs.currentLayer.props,
+        }
+      ],
+    });
+  }
+
   const [inputs, setInputs] = useState({
+    layerNum: 0,
     fileName: "model.py",
-    imageSizeX: "244",
-    imageSizeY: "244"
+    data: {
+      imageSizeX: "244",
+      imageSizeY: "244"
+    },
+    currentLayer: {
+      type:"linear",
+      props:{},
+    },
+    model: [
+    ],
+
   })
 
   return (
@@ -27,25 +100,224 @@ export default function Component () {
       <text>image size(x)</text>
       <input
         placeholder="x"
-        value={inputs.imageSizeX}
+        value={inputs.data.imageSizeX}
         onChange={(e) => setInputs({
           ...inputs,
-          imageSizeX : e.target.value
+          data : {
+            imageSizeX: e.target.value,
+            imageSizeY: inputs.data.imageSizeY,
+          }
       })}
       />
       <text>image size(y)</text>
       <input
         placeholder="y"
-        value={inputs.imageSizeY}
+        value={inputs.data.imageSizeY}
         onChange={(e) => setInputs({
           ...inputs,
-          imageSizeY : e.target.value
+          data : {
+            imageSizeX: inputs.data.imageSizeX,
+            imageSizeY: e.target.value,
+          }
       })}
       />
+      <br></br>
+      <select
+        name="layer_type"
+        multiple size="6"
+        onChange={(e) => setInputs({
+          ...inputs,
+          currentLayer : {
+            type: e.target.options[e.target.selectedIndex].value,
+            props:inputs.currentLayer.props,
+          }
+      })}
+      >
+        <optgroup label="nn.Module">
+          <option value="conv2d">conv2d</option>
+          <option value="dropout2d">dropout2d</option>
+          <option value="linear">linear</option>
+        </optgroup>
+
+        <optgroup label="F.Module">
+          <option value="relu">relu</option>
+          <option value="max_pool2d">max_pool2d</option>
+          <option value="log_softmax">log_softmax</option>
+        </optgroup>
+
+        <optgroup label="torch.Module">
+          <option value="flatten">flatten</option>
+        </optgroup>
+
+      </select>
+      
+      {
+      (inputs.currentLayer.type === 'max_pool2d')
+      &&
+      <div>
+        <text>x</text>
+        <input
+          placeholder="x"
+          onChange={(e) => setInputs({
+            ...inputs,
+            currentLayer : {
+              type: inputs.currentLayer.type,
+              props: {
+                ...inputs.currentLayer.props,
+                x : e.target.value,
+              }
+            }
+        })}
+        />
+      </div>
+      }
+
+      {
+      (inputs.currentLayer.type === 'log_softmax'
+      || inputs.currentLayer.type === 'flatten')
+      &&
+      <div>
+        <text>dim</text>
+        <input
+          placeholder="dim"
+          onChange={(e) => setInputs({
+            ...inputs,
+            currentLayer : {
+              type: inputs.currentLayer.type,
+              props: {
+                ...inputs.currentLayer.props,
+                dim : e.target.value,
+              }
+            }
+        })}
+        />
+      </div>
+      }
+
+      {
+      (inputs.currentLayer.type === 'dropout2d')
+      &&
+      <div>
+        <text>p</text>
+        <input
+          placeholder="p"
+          onChange={(e) => setInputs({
+            ...inputs,
+            currentLayer : {
+              type: inputs.currentLayer.type,
+              props: {
+                ...inputs.currentLayer.props,
+                p : e.target.value,
+              }
+            }
+        })}
+        />
+      </div>
+      }
+      
+      {
+      (inputs.currentLayer.type === 'conv2d'
+      ||
+      inputs.currentLayer.type === 'linear'
+      )
+      &&
+      <div>
+        <text>in</text>
+        <input
+          placeholder="in"
+          onChange={(e) => setInputs({
+            ...inputs,
+            currentLayer : {
+              type: inputs.currentLayer.type,
+              props: {
+                ...inputs.currentLayer.props,
+                in : e.target.value,
+              }
+            }
+        })}
+        />
+      </div>
+      }
+
+      {
+      (inputs.currentLayer.type === 'conv2d'
+      ||
+      inputs.currentLayer.type === 'linear'
+      )
+      &&
+      <div>
+        <text>out</text>
+        <input
+          placeholder="out"
+          onChange={(e) => setInputs({
+            ...inputs,
+            currentLayer : {
+              type: inputs.currentLayer.type,
+              props: {
+                ...inputs.currentLayer.props,
+                out : e.target.value,
+              }
+            }
+        })}
+        />
+      </div>
+      }
+      
+      {
+      inputs.currentLayer.type === 'conv2d'
+      &&
+      <div>
+        <text>kernel</text>
+        <input
+          placeholder="kernel size"
+          onChange={(e) => setInputs({
+            ...inputs,
+            currentLayer : {
+              type: inputs.currentLayer.type,
+              props: {
+                ...inputs.currentLayer.props,
+                kernel : e.target.value,
+              }
+            }
+        })}
+        />
+      </div>
+      }
+
+      {
+      inputs.currentLayer.type === 'conv2d'
+      &&
+      <div>
+        <text>stride</text>
+        <input
+          placeholder="stride size"
+          onChange={(e) => setInputs({
+            ...inputs,
+            currentLayer : {
+              type: inputs.currentLayer.type,
+              props: {
+                ...inputs.currentLayer.props,
+                stride : e.target.value,
+              }
+            }
+        })}
+        />
+      </div>
+      }
 
       <div>{inputs.fileName}</div>
     </form>
-    <button onClick={showValue}>Show value</button>
+
+    <button onClick={addLayer}>
+        Add Layer
+    </button>
+
+    <button onClick={showCode}>Show Code</button>
+
+    <div>
+      <button onClick={downloadZip}>Zip All</button>
+      <button onClick={downloadFile}>Download python file</button>
+    </div>
 
     <button
       disabled={inputs.fileName === "model.py"}
@@ -67,19 +339,9 @@ export default function Component () {
      train.py
     </button>
 
-    <button
-      disabled={inputs.fileName === "index.html"}
-      onClick={() => setInputs({
-        ...inputs,
-        fileName : "index.html"
-    })}
-    >
-     index.html
-    </button>
-
     <Editor
-      width="60vw"
-      height="40vh"
+      width="80vw"
+      height="60vh"
       path={files(inputs).name}
       defaultLanguage="python"
       defaultValue="You can do anything!"
