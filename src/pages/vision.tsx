@@ -67,7 +67,7 @@ export default function Component () {
           props: inputs.currentLayer.props,
         }
       ],
-    });
+    })
   }
 
   const [inputs, setInputs] = useState({
@@ -297,12 +297,11 @@ export default function Component () {
       </div>
       }
 
-    <div>
-      <button onClick={addLayer}>Add Layer</button>
-      <button onClick={showCode}>Show Code</button>
-    </div>
-    
     </form>
+    
+    <button onClick={addLayer}>Add Layer</button>
+    <button onClick={showCode}>Show Code</button>
+    
 
     <div>{inputs.fileName}</div>
 
