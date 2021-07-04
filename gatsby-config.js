@@ -16,15 +16,15 @@ module.exports = {
     // Can be used for e.g. JSONLD
     siteHeadline: `MLCoke - Code Generator`,
     // Will be used to generate absolute URLs for og:image etc.
-    siteUrl: `https://cara.lekoarts.de`,
+    siteUrl: `https://mlcoke.gatsbyjs.io`,
     // Used for SEO
-    siteDescription: `Playful and Colorful One-Page ML Code generating project featuring Parallax effects and animations`,
+    siteDescription: `Playful and Colorful One-Page ML Code Generator`,
     // Will be set on the <html /> tag
     siteLanguage: `en`,
     // Used for og:image and must be placed inside the `static` folder
-    siteImage: `/banner.png`,
+    siteImage: `/mlcoke.png`,
     // Twitter Handle
-    author: `@lekoarts_de`,
+    author: `@junnei`,
   },
   flags: {
     FAST_DEV: true,
@@ -46,7 +46,7 @@ module.exports = {
       options: {
         name: `Cara - @lekoarts/gatsby-theme-cara`,
         short_name: `Cara`,
-        description: `Playful and Colorful One-Page portfolio featuring Parallax effects and animations`,
+        description: `Playful and Colorful One-Page ML Code Generator`,
         start_url: `/`,
         background_color: `#141821`,
         theme_color: `#f6ad55`,
